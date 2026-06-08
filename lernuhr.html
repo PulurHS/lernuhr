@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ders Sayacı / Lernuhr</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=DdxzFQUCcr587qN6ap2m_WG-PJVK3Mch6qxJ3vM6cDExBQ1MH7ocMvA0G4LLHzENDWW-XD8zZ5kf5bMioMP8nEMVXtL00Q-Qmkz9LKEO8amvjCnrZ1dONXDl_Bl3LQ8frbm8aDhV8du7bndWS4B-dD4bGt_ztYETlXn3gBdxlW-eWjQSXgqYc8cOlh4XLNHHcJPpQTwZIYCwHuaa1Fmys5o9ObLANqD6TD8GkmhRruSM7Qb7XMC60pjSqfEyNdmTHDw-i2iWArw4C2a5-Zlfyh6gbJ4h3l9-6HTbfhYDYJLCQmT1dNh-nF0g5zdCXsdXXKnfe83Fx2e0UxgVEDZMElxX8nnWclpeyaeOGNl_Svt8f0FiM4oQlBqU4OlrBlB0VYo9B451SKYOhcn4tvAReCJFONF_ckPM6dvVV_O_ZzvnVQFxtgA5BZV7ZRX5j_r9PhxvqVChFuMmIwhzx_aka_1cTpNYK7kNOlQk7Ns9PCyYYEn1YpTbdsz2_bR6omsoQnB6O6vrER-q5NuxTYonSJFvU95Z_JPLlLlSZVUJ_HvXgorlsibDnS7aF74cLuZiCeNy43_zhAmpnmoIEEwIgL5l5XRvW1rMZjnwJ0f4CTKAxS0NyBA_P7epoDMlAbPp" charset="UTF-8"></script><style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --panel: #1a1a1f;
+    --border: #2a2a35;
+    --accent: #c8ff57;
+    --accent-dim: rgba(200,255,87,0.12);
+    --accent-glow: rgba(200,255,87,0.3);
+    --text: #e8e8ec;
+    --text-muted: #6b6b7a;
+    --text-dim: #3d3d4d;
+    --danger: #ff5757;
+    --danger-dim: rgba(255,87,87,0.15);
+    --warn: #ffb347;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .title-block h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .title-block p {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .lang-switch {
+    display: flex;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .lang-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    font-family: 'Noto Sans', sans-serif;
+  }
+
+  .lang-btn.active {
+    background: var(--accent);
+    color: #0d0d0f;
+  }
+
+  /* Clock display */
+  .clock-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px 32px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .clock-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    transform: scaleX(var(--progress, 1));
+    transition: transform 1s linear;
+  }
+
+  .clock-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .clock-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 96px;
+    letter-spacing: 6px;
+    line-height: 1;
+    color: var(--text);
+    transition: color 0.5s;
+    user-select: none;
+  }
+
+  .clock-display.warning {
+    color: var(--warn);
+    animation: pulse-warn 1s ease-in-out infinite;
+  }
+
+  .clock-display.danger {
+    color: var(--danger);
+    animation: pulse-danger 0.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-warn {
+    0%,100% { opacity:1; }
+    50% { opacity:0.7; }
+  }
+  @keyframes pulse-danger {
+    0%,100% { opacity:1; }
+    50% { opacity:0.4; }
+  }
+
+  .clock-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: all 0.3s;
+  }
+
+  .status-badge.running {
+    color: var(--accent);
+    border-color: var(--accent-glow);
+    background: var(--accent-dim);
+  }
+
+  .status-badge.done {
+    color: var(--danger);
+    border-color: rgba(255,87,87,0.4);
+    background: var(--danger-dim);
+  }
+
+  .progress-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Preset buttons */
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 12px;
+  }
+
+  .presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .preset-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.2s;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .preset-btn span {
+    display: block;
+    font-size: 18px;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .preset-btn.active span { color: var(--accent); }
+
+  /* Custom input */
+  .custom-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+
+  .custom-input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .custom-input-wrap input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 50px 12px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'DM Mono', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .custom-input-wrap input:focus {
+    border-color: var(--accent);
+  }
+
+  .custom-input-wrap input::placeholder {
+    color: var(--text-dim);
+  }
+
+  .custom-input-wrap .unit {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .set-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .set-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Control buttons */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ctrl-btn {
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    font-family: 'Noto Sans', sans-serif;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .ctrl-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d0d0f;
+  }
+
+  .ctrl-btn.primary:hover {
+    background: #d4ff6a;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .ctrl-btn.secondary {
+    background: transparent;
+    color: var(--text-muted);
+  }
+
+  .ctrl-btn.secondary:hover {
+    border-color: var(--text-muted);
+    color: var(--text);
+  }
+
+  .ctrl-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Alert overlay */
+  .alert-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,13,15,0.9);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+
+  .alert-overlay.show {
+    display: flex;
+    animation: fade-in 0.3s ease;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .alert-box {
+    background: var(--surface);
+    border: 1px solid var(--danger);
+    border-radius: 24px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 380px;
+    width: 90%;
+    box-shadow: 0 0 60px rgba(255,87,87,0.2);
+    animation: pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes pop-in {
+    from { transform: scale(0.8); opacity:0; }
+    to { transform: scale(1); opacity:1; }
+  }
+
+  .alert-icon {
+    font-size: 56px;
+    margin-bottom: 16px;
+    animation: ring 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes ring {
+    from { transform: rotate(-12deg); }
+    to { transform: rotate(12deg); }
+  }
+
+  .alert-box h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--danger);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .alert-box p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .alert-dismiss {
+    background: var(--danger);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 40px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Noto Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .alert-dismiss:hover {
+    background: #ff7070;
+    box-shadow: 0 0 20px rgba(255,87,87,0.4);
+  }
+
+  /* Sound selector */
+  .sound-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .sound-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.2s;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .sound-btn .sound-icon {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .sound-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .sound-btn.active {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .sound-btn .preview-dot {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .sound-btn.active .preview-dot { opacity: 1; }
+
+  /* History */
+  .history {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 4px;
+  }
+
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .history-item:last-child { border-bottom: none; }
+
+  .history-item .hi-time {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .history-empty {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    text-align: center;
+    padding: 12px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="title-block">
+      <h1 id="app-title">DERS SAYACI</h1>
+      <p id="app-sub">Çalışma zamanlayıcısı</p>
+    </div>
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('tr')">TR</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+    </div>
+  </div>
+
+  <div class="clock-wrapper" id="clockWrapper">
+    <div class="clock-label" id="label-remaining">KALAN SÜRE</div>
+    <div class="clock-display" id="clockDisplay">00:00</div>
+    <div class="clock-sub">
+      <div class="status-badge" id="statusBadge" data-tr="HAZIR" data-de="BEREIT">HAZIR</div>
+      <div class="progress-text" id="progressText">—</div>
+    </div>
+  </div>
+
+  <div class="section-label" id="label-quick">HIZLI SEÇIM</div>
+  <div class="presets">
+    <button class="preset-btn" onclick="selectPreset(10, this)"><span>10</span><span id="min-unit">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(15, this)"><span>15</span><span id="min-unit2">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(25, this)"><span>25</span><span id="min-unit3">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(30, this)"><span>30</span><span id="min-unit4">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(45, this)"><span>45</span><span id="min-unit5">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(60, this)"><span>60</span><span id="min-unit6">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(90, this)"><span>90</span><span id="min-unit7">dk</span></button>
+    <button class="preset-btn" onclick="selectPreset(120, this)"><span>120</span><span id="min-unit8">dk</span></button>
+  </div>
+
+  <div class="section-label" id="label-custom">ÖZEL SÜRE</div>
+  <div class="custom-row">
+    <div class="custom-input-wrap">
+      <input type="number" id="customInput" min="1" max="480" placeholder="örn. 35">
+      <span class="unit" id="custom-unit">DAK.</span>
+    </div>
+    <button class="set-btn" id="setCustomBtn" onclick="setCustom()">Ayarla</button>
+  </div>
+
+  <div class="section-label" id="label-sound">UYARI SESİ</div>
+  <div class="sound-selector">
+    <button class="sound-btn active" onclick="selectSound('melody', this)" id="sound-melody">
+      <span class="sound-icon">🎵</span>
+      <span id="snd-melody-label">Melodi</span>
+      <span class="preview-dot"></span>
+    </button>
+    <button class="sound-btn" onclick="selectSound('beep', this)" id="sound-beep">
+      <span class="sound-icon">📡</span>
+      <span id="snd-beep-label">Bip Bip</span>
+      <span class="preview-dot"></span>
+    </button>
+    <button class="sound-btn" onclick="selectSound('bell', this)" id="sound-bell">
+      <span class="sound-icon">🔔</span>
+      <span id="snd-bell-label">Zil</span>
+      <span class="preview-dot"></span>
+    </button>
+    <button class="sound-btn" onclick="selectSound('chime', this)" id="sound-chime">
+      <span class="sound-icon">✨</span>
+      <span id="snd-chime-label">Çan</span>
+      <span class="preview-dot"></span>
+    </button>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn primary" id="startBtn" onclick="startTimer()" disabled>▶ Başlat</button>
+    <button class="ctrl-btn secondary" id="pauseBtn" onclick="pauseTimer()" disabled>⏸ Duraklat</button>
+    <button class="ctrl-btn secondary" id="resetBtn" onclick="resetTimer()" disabled>↺ Sıfırla</button>
+  </div>
+
+  <div class="history">
+    <div class="section-label" id="label-history">OTURUM GEÇMİŞİ</div>
+    <div id="historyList"><div class="history-empty" id="history-empty">Henüz tamamlanan oturum yok.</div></div>
+  </div>
+</div>
+
+<!-- Alert overlay -->
+<div class="alert-overlay" id="alertOverlay">
+  <div class="alert-box">
+    <div class="alert-icon">🔔</div>
+    <h2 id="alert-title">SÜRE DOLDU!</h2>
+    <p id="alert-body">Belirlediğin çalışma süresi sona erdi.<br>Kısa bir mola ver, iyi çalışmalar! 🎉</p>
+    <button class="alert-dismiss" id="alertDismissBtn" onclick="dismissAlert()">Tamam</button>
+  </div>
+</div>
+
+<script>
+// ───── STATE ─────
+let lang = 'tr';
+let totalSeconds = 0;
+let remaining = 0;
+let timerInterval = null;
+let running = false;
+let paused = false;
+let sessionStart = null;
+let sessions = [];
+let audioCtx = null;
+let alarmInterval = null;
+
+// ───── TRANSLATIONS ─────
+const T = {
+  tr: {
+    appTitle: 'DERS SAYACI',
+    appSub: 'Çalışma zamanlayıcısı',
+    labelRemaining: 'KALAN SÜRE',
+    labelQuick: 'HIZLI SEÇİM',
+    labelCustom: 'ÖZEL SÜRE',
+    labelHistory: 'OTURUM GEÇMİŞİ',
+    statusReady: 'HAZIR',
+    statusRunning: 'ÇALIŞIYOR',
+    statusPaused: 'DURAKLATILDI',
+    statusDone: 'TAMAMLANDI',
+    minUnit: 'dk',
+    customUnit: 'DAK.',
+    customPlaceholder: 'örn. 35',
+    setBtn: 'Ayarla',
+    startBtn: '▶ Başlat',
+    pauseBtn: '⏸ Duraklat',
+    resumeBtn: '▶ Devam',
+    resetBtn: '↺ Sıfırla',
+    alertTitle: 'SÜRE DOLDU!',
+    alertBody: 'Belirlediğin çalışma süresi sona erdi.<br>Kısa bir mola ver, iyi çalışmalar! 🎉',
+    dismissBtn: 'Tamam',
+    historyEmpty: 'Henüz tamamlanan oturum yok.',
+    sessionLabel: 'Oturum',
+    labelSound: 'UYARI SESİ',
+    sndMelody: 'Melodi',
+    sndBeep: 'Bip Bip',
+    sndBell: 'Zil',
+    sndChime: 'Çan',
+  },
+  de: {
+    appTitle: 'LERNUHR',
+    appSub: 'Studienzeitgeber',
+    labelRemaining: 'VERBLEIBENDE ZEIT',
+    labelQuick: 'SCHNELLAUSWAHL',
+    labelCustom: 'BENUTZERDEFINIERT',
+    labelHistory: 'SITZUNGSVERLAUF',
+    statusReady: 'BEREIT',
+    statusRunning: 'LÄUFT',
+    statusPaused: 'PAUSIERT',
+    statusDone: 'ABGESCHLOSSEN',
+    minUnit: 'Min',
+    customUnit: 'MIN.',
+    customPlaceholder: 'z.B. 35',
+    setBtn: 'Einstellen',
+    startBtn: '▶ Starten',
+    pauseBtn: '⏸ Pause',
+    resumeBtn: '▶ Weiter',
+    resetBtn: '↺ Zurücksetzen',
+    alertTitle: 'ZEIT IST UM!',
+    alertBody: 'Deine Lernzeit ist abgelaufen.<br>Mach eine kurze Pause – gut gemacht! 🎉',
+    dismissBtn: 'OK',
+    historyEmpty: 'Noch keine abgeschlossenen Sitzungen.',
+    sessionLabel: 'Sitzung',
+    labelSound: 'ALARMTON',
+    sndMelody: 'Melodie',
+    sndBeep: 'Piep Piep',
+    sndBell: 'Klingel',
+    sndChime: 'Glocke',
+  }
+};
+
+// ───── AUDIO ─────
+let selectedSound = 'melody';
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playBeep(freq = 880, duration = 0.15, type = 'sine', vol = 0.5) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+
+// 🎵 Melodi — yükselen 4'lü arpej (orijinal)
+function playMelody() {
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((f, i) => {
+    setTimeout(() => playBeep(f, 0.22, 'triangle', 0.55), i * 130);
+  });
+}
+
+// 📡 Bip Bip — üç kısa elektronik bip
+function playBipBip() {
+  [0, 220, 440].forEach(delay => {
+    setTimeout(() => playBeep(1320, 0.1, 'square', 0.4), delay);
+  });
+}
+
+// 🔔 Zil — zengin, titreşimli çan
+function playBell() {
+  try {
+    const ctx = getAudioCtx();
+    // Ana ton + harmonikler
+    [[660, 1.0], [1320, 0.4], [1980, 0.2], [2640, 0.1]].forEach(([freq, vol]) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 1.4);
+    });
+  } catch(e) {}
+}
+
+// ✨ Çan — yumuşak, huzurlu pentatonik dizi
+function playChime() {
+  const pentatonic = [523, 587, 659, 784, 880];
+  pentatonic.forEach((f, i) => {
+    setTimeout(() => {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.8);
+      } catch(e) {}
+    }, i * 160);
+  });
+}
+
+const SOUND_FNS = {
+  melody: { fn: playMelody, interval: 1900 },
+  beep:   { fn: playBipBip, interval: 1400 },
+  bell:   { fn: playBell,   interval: 2200 },
+  chime:  { fn: playChime,  interval: 2000 },
+};
+
+function selectSound(name, btn) {
+  selectedSound = name;
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Preview
+  SOUND_FNS[name].fn();
+}
+
+function playTickBeep() {
+  playBeep(1200, 0.05, 'sine', 0.15);
+}
+
+function startAlarmLoop() {
+  const s = SOUND_FNS[selectedSound];
+  s.fn();
+  alarmInterval = setInterval(s.fn, s.interval);
+}
+
+function stopAlarmLoop() {
+  clearInterval(alarmInterval);
+  alarmInterval = null;
+}
+
+// ───── TIMER LOGIC ─────
+function selectPreset(minutes, btn) {
+  if (running) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('customInput').value = '';
+  setTime(minutes * 60);
+}
+
+function setCustom() {
+  if (running) return;
+  const val = parseInt(document.getElementById('customInput').value);
+  if (!val || val < 1 || val > 480) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  setTime(val * 60);
+}
+
+function setTime(seconds) {
+  totalSeconds = seconds;
+  remaining = seconds;
+  updateDisplay();
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('pauseBtn').disabled = true;
+  document.getElementById('resetBtn').disabled = false;
+  setStatus('ready');
+  document.getElementById('progressText').textContent = formatTime(seconds);
+  updateProgressBar(1);
+}
+
+function startTimer() {
+  if (!totalSeconds) return;
+  if (paused) {
+    paused = false;
+    running = true;
+    document.getElementById('pauseBtn').textContent = T[lang].pauseBtn;
+    setStatus('running');
+    timerInterval = setInterval(tick, 1000);
+    return;
+  }
+  running = true;
+  paused = false;
+  sessionStart = Date.now();
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('pauseBtn').disabled = false;
+  document.getElementById('resetBtn').disabled = false;
+  setStatus('running');
+  timerInterval = setInterval(tick, 1000);
+}
+
+function pauseTimer() {
+  if (!running) return;
+  running = false;
+  paused = true;
+  clearInterval(timerInterval);
+  setStatus('paused');
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = T[lang].resumeBtn;
+  document.getElementById('pauseBtn').disabled = true;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  stopAlarmLoop();
+  running = false;
+  paused = false;
+  remaining = totalSeconds;
+  document.getElementById('alertOverlay').classList.remove('show');
+  document.getElementById('startBtn').disabled = !totalSeconds;
+  document.getElementById('startBtn').textContent = T[lang].startBtn;
+  document.getElementById('pauseBtn').disabled = true;
+  document.getElementById('resetBtn').disabled = !totalSeconds;
+  document.getElementById('clockDisplay').className = 'clock-display';
+  setStatus('ready');
+  updateDisplay();
+  updateProgressBar(totalSeconds ? 1 : 0);
+  if (totalSeconds) document.getElementById('progressText').textContent = formatTime(totalSeconds);
+  else document.getElementById('progressText').textContent = '—';
+}
+
+function tick() {
+  if (remaining <= 0) {
+    finish();
+    return;
+  }
+  remaining--;
+  updateDisplay();
+  const ratio = remaining / totalSeconds;
+  updateProgressBar(ratio);
+
+  // Warning states
+  const disp = document.getElementById('clockDisplay');
+  if (remaining <= 10) {
+    disp.className = 'clock-display danger';
+    playTickBeep();
+  } else if (remaining <= 60) {
+    disp.className = 'clock-display warning';
+  } else {
+    disp.className = 'clock-display';
+  }
+
+  if (totalSeconds > 0) {
+    const elapsed = totalSeconds - remaining;
+    document.getElementById('progressText').textContent =
+      formatTime(elapsed) + ' / ' + formatTime(totalSeconds);
+  }
+}
+
+function finish() {
+  clearInterval(timerInterval);
+  running = false;
+  remaining = 0;
+  updateDisplay();
+  updateProgressBar(0);
+  setStatus('done');
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('pauseBtn').disabled = true;
+  document.getElementById('clockDisplay').className = 'clock-display danger';
+
+  // Log session
+  const dur = Math.round(totalSeconds / 60);
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  sessions.push({ dur, time: timeStr });
+  renderHistory();
+
+  // Alarm
+  startAlarmLoop();
+  document.getElementById('alertOverlay').classList.add('show');
+}
+
+function dismissAlert() {
+  stopAlarmLoop();
+  document.getElementById('alertOverlay').classList.remove('show');
+  resetTimer();
+}
+
+// ───── UI ─────
+function formatTime(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) {
+    return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+  return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+function updateDisplay() {
+  document.getElementById('clockDisplay').textContent = formatTime(remaining);
+}
+
+function updateProgressBar(ratio) {
+  document.getElementById('clockWrapper').style.setProperty('--progress', ratio);
+}
+
+function setStatus(state) {
+  const badge = document.getElementById('statusBadge');
+  badge.className = 'status-badge';
+  if (state === 'running') { badge.classList.add('running'); badge.textContent = T[lang].statusRunning; }
+  else if (state === 'paused') { badge.textContent = T[lang].statusPaused; }
+  else if (state === 'done') { badge.classList.add('done'); badge.textContent = T[lang].statusDone; }
+  else { badge.textContent = T[lang].statusReady; }
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (sessions.length === 0) {
+    list.innerHTML = `<div class="history-empty" id="history-empty">${T[lang].historyEmpty}</div>`;
+    return;
+  }
+  list.innerHTML = sessions.slice().reverse().map((s, i) => `
+    <div class="history-item">
+      <span>${T[lang].sessionLabel} ${sessions.length - i}</span>
+      <span class="hi-time">${s.dur} ${T[lang].minUnit}</span>
+      <span>${s.time}</span>
+    </div>
+  `).join('');
+}
+
+// ───── LANGUAGE ─────
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  applyLang();
+}
+
+function applyLang() {
+  const t = T[lang];
+  document.getElementById('app-title').textContent = t.appTitle;
+  document.getElementById('app-sub').textContent = t.appSub;
+  document.getElementById('label-remaining').textContent = t.labelRemaining;
+  document.getElementById('label-quick').textContent = t.labelQuick;
+  document.getElementById('label-custom').textContent = t.labelCustom;
+  document.getElementById('label-history').textContent = t.labelHistory;
+  document.getElementById('custom-unit').textContent = t.customUnit;
+  document.getElementById('customInput').placeholder = t.customPlaceholder;
+  document.getElementById('setCustomBtn').textContent = t.setBtn;
+  document.getElementById('resetBtn').textContent = t.resetBtn;
+  document.getElementById('pauseBtn').textContent = paused ? t.resumeBtn : t.pauseBtn;
+  document.getElementById('startBtn').textContent = paused ? t.resumeBtn : t.startBtn;
+  document.getElementById('alert-title').textContent = t.alertTitle;
+  document.getElementById('alert-body').innerHTML = t.alertBody;
+  document.getElementById('alertDismissBtn').textContent = t.dismissBtn;
+
+  // Update all minute unit spans
+  ['min-unit','min-unit2','min-unit3','min-unit4','min-unit5','min-unit6','min-unit7','min-unit8'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t.minUnit;
+  });
+
+  document.getElementById('label-sound').textContent = t.labelSound;
+  document.getElementById('snd-melody-label').textContent = t.sndMelody;
+  document.getElementById('snd-beep-label').textContent = t.sndBeep;
+  document.getElementById('snd-bell-label').textContent = t.sndBell;
+  document.getElementById('snd-chime-label').textContent = t.sndChime;
+
+  // Status
+  if (!running && !paused && remaining === totalSeconds) setStatus('ready');
+  else if (running) setStatus('running');
+  else if (paused) setStatus('paused');
+
+  renderHistory();
+}
+
+// Init
+document.getElementById('customInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') setCustom();
+});
+applyLang();
+</script>
+</body>
+</html>
